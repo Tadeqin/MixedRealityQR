@@ -2,113 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <!-- Responsive viewport for mobile -->
+  <!-- Responsive viewport -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Final Seal</title>
-  <!-- MedievalSharp font for thematic style -->
   <link href="https://fonts.googleapis.com/css2?family=Cardo&display=swap" rel="stylesheet">
   <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: url('./Resources/parchment.png') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'Cardo', cursive, serif;
-      color: #3e2c1c;
-    }
-    .container {
-      max-width: 90%;
-      width: 600px;
-      margin: 40px auto;
-      padding: 20px;
-      background: rgba(255, 248, 220, 0.8);
-      border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    }
-    .container p {
-      font-size: 1.2rem;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-    #controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 20px; }
-    input#codeInput { font-size: 2rem; width: 200px; text-align: center; }
-    button { font-size: 1rem; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; background: #3e2c1c; color: #fff; }
-    button:hover { background: #2e1f14; }
-    #feedback { margin-top: 20px; font-size: 1.1rem; text-align: center; display: none; }
-    #feedback.success { color: green; }
-    #feedback.failure { color: red; }
-    .hint-text { margin-top: 10px; font-size: 0.9rem; text-align: center; opacity: 0.8; }
-    /* Success full-screen message */
-    #successScreen {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-      padding: 20px;
-    }
-    #successScreen p {
-      font-size: 3rem;
-      color: #3e2c1c;
-      background: rgba(255, 248, 220, 0.8);
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
+    body { margin:0; padding:0; background:url('./Resources/parchment.png') no-repeat center center fixed; background-size:cover; font-family:'Cardo',cursive,serif; color:#3e2c1c; }
+    .container { max-width:90%; width:600px; margin:40px auto; padding:20px; background:rgba(255,248,220,0.8); border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.5); text-shadow:1px 1px 2px rgba(0,0,0,0.2); }
+    .container p { font-size:1.2rem; line-height:1.6; margin-bottom:1.5rem; }
+    #controls { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:20px; }
+    #codeInput { font-size:2rem; width:200px; text-align:center; }
+    button { font-size:1rem; padding:8px 16px; border:none; border-radius:4px; cursor:pointer; background:#3e2c1c; color:#fff; }
+    button:hover { background:#2e1f14; }
+    .hint-text { margin-top:10px; font-size:0.9rem; text-align:center; opacity:0.8; }
+    #feedback { margin-top:20px; font-size:1.1rem; text-align:center; display:none; }
+    #feedback.failure { color:red; }
+    #successScreen { display:flex; justify-content:center; align-items:center; height:100vh; text-align:center; padding:20px; }
+    #successScreen p { font-size:3rem; background:rgba(255,248,220,0.9); padding:20px; border-radius:8px; box-shadow:0 0 20px rgba(0,0,0,0.5); }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="mainContainer">
     <p>You have finally entered the cult’s last chamber. Here lies the dark core of the ritual—the “Gate of Nothingness.” Their ultimate sacrifice was sealed here, and only by reversing the chant can you rebind it. Listen to the echo of the chant and extract the hidden numeric code to activate the seal’s power.</p>
     <audio id="chantAudio" src="./Resources/chant.mp3"></audio>
     <div id="controls">
       <button id="replayBtn">Replay Chant</button>
-      <input type="text" id="codeInput" maxlength="3" placeholder="###" pattern="\d{3}">
+      <input type="text" id="codeInput" maxlength="3" placeholder="###">
       <button id="submitBtn">Submit</button>
-      <button id="resetInputBtn">Reset</button>
+      <button id="resetBtn">Reset</button>
     </div>
-    <div id="feedback"></div>
+    <div id="feedback" class="failure"></div>
     <p class="hint-text">Arrange the numbers hidden in the chant in order to activate the seal’s power.</p>
   </div>
   <script>
     const chantAudio = document.getElementById('chantAudio');
     const replayBtn = document.getElementById('replayBtn');
     const submitBtn = document.getElementById('submitBtn');
-    const resetInputBtn = document.getElementById('resetInputBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const codeInput = document.getElementById('codeInput');
     const feedback = document.getElementById('feedback');
 
-    // Play initial chant
-    window.addEventListener('load', () => {
-      chantAudio.play().catch(() => {});
-    });
+    // Auto-play on load
+    window.addEventListener('load', () => chantAudio.play().catch(() => {}));
 
-    // Replay chant on demand
-    replayBtn.addEventListener('click', () => {
-      chantAudio.currentTime = 0;
-      chantAudio.play();
-    });
+    // Replay chant
+    replayBtn.addEventListener('click', () => { chantAudio.currentTime = 0; chantAudio.play(); feedback.style.display = 'none'; });
 
-    // Reset input and feedback
-    resetInputBtn.addEventListener('click', () => {
-      codeInput.value = '';
-      feedback.style.display = 'none';
-      feedback.textContent = '';
-    });
+    // Reset input and replay
+    resetBtn.addEventListener('click', () => { codeInput.value = ''; chantAudio.currentTime = 0; chantAudio.play().catch(() => {}); feedback.style.display = 'none'; });
 
-    // Validate code on submit
+    // Submit code
     submitBtn.addEventListener('click', () => {
       const val = codeInput.value.trim();
-      // Stop audio
-      chantAudio.pause();
-      chantAudio.currentTime = 0;
+      chantAudio.pause(); chantAudio.currentTime = 0;
       if (val === '628') {
-        // Clear page and show full-screen success message
-        document.body.innerHTML = '<div id="successScreen"><p>Seal reversal successful! The darkness is permanently locked away.</p></div>';
+        // Play celebration audio
+        const audio = new Audio('./Resources/celebration.mp3');
+        audio.play().catch(() => {});
+        // Show success screen
+        const main = document.getElementById('mainContainer');
+        main.innerHTML = '<div id="successScreen"><p>Seal reversal successful! The darkness is permanently locked away.</p></div>';
       } else {
-        feedback.textContent = 'The chant failed to fully reverse. Please replay the chant and try again.';
-        feedback.className = 'failure';
+        feedback.textContent = 'The chant failed to fully reverse. Please replay and try again.';
         feedback.style.display = 'block';
       }
     });
