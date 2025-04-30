@@ -1,54 +1,66 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>古老手稿</title>
-  <!-- 引入仿古手写字体（可选） -->
-  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap" rel="stylesheet">
+  <!-- Responsive viewport for mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ancient Manuscript</title>
+  <!-- MedievalSharp font for thematic style -->
+  <link href="https://fonts.googleapis.com/css2?family=Cardo&display=swap" rel="stylesheet">
   <style>
-    /* 整页背景 */
     body {
       margin: 0;
       padding: 0;
-      /* 背景图请替换成自己的羊皮纸纹理 */
       background: url('./Resources/parchment.png') no-repeat center center fixed;
       background-size: cover;
-      font-family: 'MedievalSharp', cursive;
+      font-family: 'MedievalSharp', cursive, serif;
       color: #3e2c1c;
     }
-    /* 内容容器 */
     .container {
-      max-width: 800px;
-      margin: 60px auto;
-      padding: 40px;
-      /* 半透明的“淡羊皮”覆盖，增强可读性 */
+      max-width: 90%;
+      width: 800px;
+      margin: 20px auto;
+      padding: 20px;
       background: rgba(255, 248, 220, 0.8);
       border-radius: 8px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
       text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
-    /* 正文样式 */
     .container p.main {
       font-size: 1.2rem;
-      line-height: 1.8;
-      margin-bottom: 2rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
     }
-    /* 小字提示 */
     .container p.note {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       text-align: right;
       margin-top: 1rem;
       opacity: 0.7;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+        margin: 15px auto;
+      }
+      .container p.main {
+        font-size: 1rem;
+        line-height: 1.4;
+      }
+      .container p.note {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <p class="main">
-      几百年前，这片土地曾被7位神秘教徒占据。古树下，他们用血祭之术召唤黑暗力量。仪式失败后，教徒们逃散，只留下破碎手稿和未了的咒语。如今，你踏入这片后院，必须从古树的阴影中寻找被遗忘的线索，阻止邪恶重生。
+      Centuries ago, this land was claimed by seven enigmatic cultists. Beneath the ancient tree, they performed a blood ritual to summon dark powers. When the ceremony failed, the cultists scattered, leaving only shattered manuscripts and unfinished incantations. Now, you step into this backyard, and you must search the shadows of the ancient tree for the forgotten clues to stop the evil from rising again.
     </p>
     <p class="note">
-      在绳索上你将发现一些蛛丝马迹
+      On the rope, you will discover subtle clues
     </p>
   </div>
 </body>

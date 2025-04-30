@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Responsive viewport for mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sealing Puzzle</title>
+  <!-- MedievalSharp font for thematic style -->
+  <link href="https://fonts.googleapis.com/css2?family=Cardo&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('./Resources/parchment.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'MedievalSharp', cursive, serif;
+      color: #3e2c1c;
+    }
+    .container {
+      max-width: 90%;
+      width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255, 248, 220, 0.8);
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .container p.main {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Puzzle layout */
+    #puzzle-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+    /* 3x3 grid of drop zones */
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(3, min(80px, 30vw));
+      grid-template-rows: repeat(3, min(80px, 30vw));
+      gap: 5px;
+    }
+    .dropzone {
+      width: 100%;
+      height: 0;
+      padding-bottom: 100%; /* square ratio */
+      border: 2px dashed #aaa;
+      border-radius: 4px;
+      position: relative;
+    }
+    .dropzone img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+    }
+    /* Tile palette: use grid for consistent layout */
+    #tiles {
+      display: grid;
+      grid-template-columns: repeat(3, min(60px, 20vw));
+      gap: 5px;
+      justify-content: center;
+    }
+    #tiles img {
+      width: 100%;
+      height: auto;
+      cursor: grab;
+      border: 2px solid transparent;
+      border-radius: 4px;
+    }
+    #tiles.dragover {
+      outline: 2px dashed #3e2c1c;
+    }
+    /* Controls */
+    #controls {
+      margin-top: 15px;
+      text-align: center;
+    }
+    #resetBtn {
+      padding: 8px 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 4px;
+      background: #a00;
+      color: #fff;
+      cursor: pointer;
+    }
+    #resetBtn:hover { background: #800; }
+    /* Hint message */
+    #hint {
+      margin-top: 20px;
+      padding: 15px;
+      background: rgba(255,248,220,0.9);
+      border: 2px solid #3e2c1c;
+      border-radius: 6px;
+      display: none;
+    }
+    #hint p { margin: 0 0 0.5rem; }
+    #next-level {
+      color: red;
+      font-weight: bold;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    /* Media queries for smaller screens */
+    @media (max-width: 480px) {
+      .container { padding: 15px; }
+      .container p.main { font-size: 1rem; }
+      #resetBtn { padding: 6px 12px; font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="main">
+      This wall was once the sturdy barrier of the sealing ritual. Over the years, the sealing array has broken into four parts. To proceed, you must reassemble the sealing diagram and restore its protective power.
+    </p>
+    <div id="puzzle-container">
+      <div id="grid">
+        <div class="dropzone" data-index="1"></div>
+        <div class="dropzone" data-index="2"></div>
+        <div class="dropzone" data-index="3"></div>
+        <div class="dropzone" data-index="4"></div>
+        <div class="dropzone" data-index="5"></div>
+        <div class="dropzone" data-index="6"></div>
+        <div class="dropzone" data-index="7"></div>
+        <div class="dropzone" data-index="8"></div>
+        <div class="dropzone" data-index="9"></div>
+      </div>
+      <div id="tiles">
+        <img src="Resources/symbol_1.png" id="tile1" draggable="true" alt="tile 1">
+        <img src="Resources/symbol_2.png" id="tile2" draggable="true" alt="tile 2">
+        <img src="Resources/symbol_3.png" id="tile3" draggable="true" alt="tile 3">
+        <img src="Resources/symbol_4.png" id="tile4" draggable="true" alt="tile 4">
+        <img src="Resources/symbol_5.png" id="tile5" draggable="true" alt="tile 5">
+        <img src="Resources/symbol_6.png" id="tile6" draggable="true" alt="tile 6">
+        <img src="Resources/symbol_7.png" id="tile7" draggable="true" alt="tile 7">
+        <img src="Resources/symbol_8.png" id="tile8" draggable="true" alt="tile 8">
+        <img src="Resources/symbol_9.png" id="tile9" draggable="true" alt="tile 9">
+      </div>
+    </div>
+    <div id="controls">
+      <button id="resetBtn">Reset Puzzle</button>
+    </div>
+    <div id="hint">
+      <p>The sealing power has been restored. The door to the hidden chamber leading to the heart of darkness will now open for you.</p>
+      <p id="next-level">Next level → Storeroom Entrance</p>
+    </div>
+  </div>
+  <script>
+    const tilesContainer = document.getElementById('tiles');
+    let dragged = null;
+
+    // Shuffle tiles on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const tiles = Array.from(tilesContainer.children);
+      for (let i = tiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        tilesContainer.appendChild(tiles[j]);
+      }
+    });
+
+    // Drag start/end
+    document.querySelectorAll('#tiles img').forEach(img => {
+      img.addEventListener('dragstart', e => {
+        dragged = e.target;
+        setTimeout(() => dragged.style.visibility = 'hidden', 0);
+      });
+      img.addEventListener('dragend', e => { dragged.style.visibility = 'visible'; dragged = null; });
+    });
+
+    // Drop zones
+    document.querySelectorAll('.dropzone').forEach(zone => {
+      zone.addEventListener('dragover', e => e.preventDefault());
+      zone.addEventListener('drop', e => {
+        e.preventDefault();
+        if (!zone.firstElementChild && dragged) {
+          zone.appendChild(dragged);
+          checkPuzzle();
+        }
+      });
+    });
+
+    // Allow dragging back
+    tilesContainer.addEventListener('dragover', e => { e.preventDefault(); tilesContainer.classList.add('dragover'); });
+    tilesContainer.addEventListener('dragleave', () => tilesContainer.classList.remove('dragover'));
+    tilesContainer.addEventListener('drop', e => { e.preventDefault(); tilesContainer.classList.remove('dragover'); if (dragged) tilesContainer.appendChild(dragged); });
+
+    // Check correctness
+    function checkPuzzle() {
+      const zones = document.querySelectorAll('.dropzone');
+      for (let z of zones) {
+        if (!z.firstElementChild || z.firstElementChild.id !== 'tile' + z.dataset.index) return;
+      }
+      document.getElementById('hint').style.display = 'block';
+    }
+
+    // Reset
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.querySelectorAll('.dropzone img').forEach(img => tilesContainer.appendChild(img));
+      document.getElementById('hint').style.display = 'none';
+    });
+
+    // Next level click
+    document.getElementById('next-level').addEventListener('click', () => {
+      // window.location.href = 'level4.html';
+    });
+  </script>
+</body>
+</html>

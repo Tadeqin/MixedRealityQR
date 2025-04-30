@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <!-- Responsive viewport for mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Caesar Cipher Puzzle</title>
+  <!-- MedievalSharp font for thematic style -->
+  <link href="https://fonts.googleapis.com/css2?family=Cardo&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('./Resources/parchment.png') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'MedievalSharp', cursive, serif;
+      color: #3e2c1c;
+    }
+    .container {
+      max-width: 90%;
+      width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      background: rgba(255, 248, 220, 0.8);
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    .container p.main {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      margin-bottom: 1.5rem;
+    }
+    .container p.note {
+      font-size: 0.9rem;
+      text-align: right;
+      margin-bottom: 2rem;
+      opacity: 0.7;
+    }
+    /* Puzzle styles */
+    .puzzle {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+    .cipher-box {
+      font-size: 1.5rem;
+      letter-spacing: 2px;
+      flex: 1 1 auto;
+      text-align: center;
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+      flex: 1 1 auto;
+    }
+    .controls label {
+      font-size: 1rem;
+    }
+    .controls input {
+      width: 80px;
+      padding: 8px;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      font-size: 1rem;
+      text-align: center;
+    }
+    .controls button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      background: #3e2c1c;
+      color: #fff;
+      text-shadow: none;
+    }
+    .controls button:hover {
+      background: #2e1f14;
+    }
+    /* Bingo hint */
+    #bingoMsg {
+      font-size: 1rem;
+      font-weight: bold;
+      color: red;
+      display: none;
+      flex-basis: 100%;
+      text-align: center;
+      margin-top: 10px;
+    }
+    /* Responsive tweaks */
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        margin: 20px auto;
+      }
+      .container p.main {
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+      .container p.note {
+        font-size: 0.8rem;
+      }
+      .controls input {
+        width: 60px;
+        padding: 6px;
+        font-size: 0.9rem;
+      }
+      .controls button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+      }
+      .puzzle {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="main">
+      This rope was once smeared with sacrificial blood, its stains mingled with bone powder and ashes. The cultists used it to bind the summoned wraith, yet failed to seal it completely. Now, the remnants of the incantation lie hidden within the fractured runes, and you must decipher them to proceed.
+    </p>
+    <p class="note">
+      Offset: The only number you see after starting the game.
+    </p>
+
+    <div class="puzzle">
+      <div class="cipher-box">
+        <p id="cipherText" data-original="AOL VSK DHSS">AOL VSK DHSS</p>
+      </div>
+      <div class="controls">
+        <label for="offsetInput">Offset:</label>
+        <input type="number" id="offsetInput" min="1" max="25" placeholder="1–25">
+        <button id="decryptBtn">Decrypt</button>
+        <span id="bingoMsg">Bingo!</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('decryptBtn').addEventListener('click', function() {
+      const offset = parseInt(document.getElementById('offsetInput').value, 10);
+      const bingoEl = document.getElementById('bingoMsg');
+      if (isNaN(offset) || offset < 1 || offset > 25) {
+        alert('Please enter a number between 1 and 25.');
+        bingoEl.style.display = 'none';
+        return;
+      }
+
+      if (offset === 7) {
+        bingoEl.style.display = 'block';
+      } else {
+        bingoEl.style.display = 'none';
+      }
+
+      const el = document.getElementById('cipherText');
+      const cipher = el.getAttribute('data-original').toUpperCase();
+      let decrypted = '';
+      for (let i = 0; i < cipher.length; i++) {
+        const c = cipher[i];
+        if (c >= 'A' && c <= 'Z') {
+          const code = c.charCodeAt(0) - 65;
+          const dec = (code - offset + 26) % 26;
+          decrypted += String.fromCharCode(dec + 65);
+        } else {
+          decrypted += c;
+        }
+      }
+      el.textContent = decrypted;
+    });
+  </script>
+</body>
+</html>
