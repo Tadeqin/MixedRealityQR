@@ -1,2 +1,2 @@
 # MixedRealityQR
-For Mixed Reality coursework, locative-media, project"Evil Backyard"
+For Mixed Reality coursework, locative-media, project"The Evil Backyard"
